@@ -1,8 +1,16 @@
 # 第一阶段：安装GCC
-FROM python:3.12.1-alpine as gcc_installer
+FROM python:3.11-alpine as gcc_installer
 
 # 安装GCC及其他依赖
-RUN apk add --no-cache gcc musl-dev jpeg-dev zlib-dev libjpeg
+# RUN apk update --repository=https://mirrors.aliyun.com/alpine/v3.20/main \
+#     --repository=https://mirrors.aliyun.com/alpine/v3.20/community && \
+#     apk add --no-cache gcc musl-dev jpeg-dev zlib-dev libjpeg-turbo-dev
+
+RUN echo "https://mirrors.aliyun.com/alpine/v3.20/main" > /etc/apk/repositories && \
+    echo "https://mirrors.aliyun.com/alpine/v3.20/community" >> /etc/apk/repositories && \
+    apk update && \
+    apk add --no-cache gcc musl-dev jpeg-dev zlib-dev libjpeg-turbo-dev
+
 
 # 第二阶段：安装Python依赖
 FROM gcc_installer as requirements_installer
@@ -17,7 +25,7 @@ COPY ./requirements.txt /app/
 RUN pip install --no-user --prefix=/install -r requirements.txt -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
 
 # 第三阶段：运行环境
-FROM python:3.12.1-alpine
+FROM python:3.11-alpine
 
 # 设置工作目录
 WORKDIR /app

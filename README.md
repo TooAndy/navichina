@@ -25,8 +25,6 @@ git clone navidrome-wangyiyun
 cd navidrome-wangyiyun
 # 需要 docker 环境. 默认构建为 deluan/navidrome:develop 镜像
 sh build-navidrome.sh
-# 通过 docker 的方式
-docker run -it ...
 # 通过 docker 的方式, 运行本项目的代理软件和部署修改源码重新编译后的 deluan/navidrome:develop 镜像
 # 注意修改 navichina.yaml 中的配置
 docker compose -f navichina.yaml up -d
@@ -36,7 +34,7 @@ docker compose -f navichina.yaml up -d
 > 如果需要使用其他方式运行本插件和 navidrome, 可以自己摸索一下, 就这几行代码, 比较简单
 
 ## 说明
-项目中的大量代码从 [lrcApi](https://github.com/HisAtri/LrcApi) 项目复制过来. 感谢 lrcApi 开源贡献 @HisAtri
+项目中的大量代码从 [LrcApi](https://github.com/HisAtri/LrcApi) 项目复制过来. 感谢 LrcApi 开源贡献 @HisAtri
 
 ## 协议
 GPL-3.0 license

@@ -1,5 +1,6 @@
 import re
-import opencc
+
+from ttscn import t2s
 
 """
 本模块算法针对常见音乐标题匹配场景应用，着重分离度和效率。
@@ -10,12 +11,6 @@ Levenshtein Distance算法实际表现不佳
 COPY FROM LRCAPI (https://github.com/HisAtri/LrcApi)
 """
 
-t2s_converter = opencc.OpenCC('t2s.json')
-
-def t2s(text):
-    if text:
-        return t2s_converter.convert(text)
-    return text
 
 def text_convert(text: str):
     patterns = [

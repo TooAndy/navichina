@@ -18,14 +18,14 @@ app = Flask(__name__)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 console_handler = app.logger.handlers[0]
 console_handler.setFormatter(formatter)
-app.logger.setLevel(logging.DEBUG)
+app.logger.setLevel(logging.INFO)
 
 # 缓存
 cache_dir = './.cache'
-try:
-    shutil.rmtree(cache_dir)
-except FileNotFoundError:
-    pass
+# try:
+#     shutil.rmtree(cache_dir)
+# except FileNotFoundError:
+#     pass
 
 cache = Cache(app, config={
     'CACHE_TYPE': 'filesystem',
@@ -36,10 +36,10 @@ cache = Cache(app, config={
 def make_cache_key(*args, **kwargs) -> str:
     path:str = request.path
     args:str = str(hash(frozenset(request.args.items())))
-    auth_key:str = str(request.headers.get('Authorization', '')
-                       or request.headers.get('Authentication', ''))
-    cookie:str = str(request.cookies.get('api_auth_token', ''))
-    return path + args + auth_key + cookie
+    # auth_key:str = str(request.headers.get('Authorization', '')
+                    #    or request.headers.get('Authentication', ''))
+    # cookie:str = str(request.cookies.get('api_auth_token', ''))
+    return path + args
 
 
 @app.route('/spotify/search', methods=['GET'])

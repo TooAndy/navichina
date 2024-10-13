@@ -1,30 +1,30 @@
-version: '3.1'
-
 services:
   navichina:
-    build: .
-    user: 1000:1000
+    container_name: navichina
+    image: tooandy/navichina:1.0.0
+    user: 1000:1000 # should be owner of volumes
     ports: 
       - 22522:22522
     restart: unless-stopped
-
+    volumes:
+      - /tmp/.cache:/app/.cache
 
   # 以下 navidrome 是官方推荐的配置. 根据自己需要更改
-  navidrome:
-    image: deluan/navidrome:develop
-    user: 1000:1000 # should be owner of volumes
-    ports:
-      - "4533:4533"
-    restart: unless-stopped
-    environment:
-      # Optional: put your config options customization here. Examples:
-      ND_SCANSCHEDULE: 1h
-      ND_LOGLEVEL: info  
-      ND_SESSIONTIMEOUT: 24h
-      ND_BASEURL: ""
-    volumes:
-      - "/path/to/data:/data"
-      - "/path/to/your/music/folder:/music:ro"
-    depends_on:
-      - navichina
+  # navidrome:
+  #   image: deluan/navidrome:develop
+  #   user: 1000:1000 # should be owner of volumes
+  #   ports:
+  #     - "4533:4533"
+  #   restart: unless-stopped
+  #   environment:
+  #     # Optional: put your config options customization here. Examples:
+  #     ND_SCANSCHEDULE: 1h
+  #     ND_LOGLEVEL: info  
+  #     ND_SESSIONTIMEOUT: 24h
+  #     ND_BASEURL: ""
+  #   volumes:
+  #     - "/path/to/data:/data"
+  #     - "/path/to/your/music/folder:/music:ro"
+  #   depends_on:
+  #     - navichina
 
