@@ -20,6 +20,7 @@ echo "跳过 spotify 验证, 注意, 仍然需要在配置文件或环境变量�
 sed -i '/token, err := c.authorize(ctx)/i \    token := ""' core/agents/spotify/client.go
 sed -i '/token, err := c.authorize(ctx)/{N;N;N;d;}' core/agents/spotify/client.go
 sed -i 's/err = c\.makeRequest(req, \&results)/err := c.makeRequest(req, \&results)/' core/agents/spotify/client.go
+sed -i '0,/Expect(err).To(MatchError("spotify error(invalid_client): Invalid client"))/s//Expect(err).To(BeNil())/' client_test.go
 
 # ln -s /var/lib/navidrome/navidrome.toml .
 echo "10 秒后开始构建"
