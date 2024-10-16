@@ -19,10 +19,46 @@
 2. 通过网易云音乐对艺术家和专辑的描述, 丰富了 Last.fm 的查询结果.
 
 ## 使用方法
+### **1. 直接使用已有docker镜像运行(推荐)**
+直接使用已经编译完成的 docker 镜像, 并使用如下 docker-compose.yaml, 可直接运行 [navidrome](https://github.com/TooAndy/navidrome) + navichina.
+```shell
+docker compose -f docker-compose.yaml up -d 
+```
+
+docker-compose.yaml 内容如下, 如果需要修改配置, 请参考注释
+
+```yaml
+services:
+  navidrome:
+    container_name: navidrome
+    image: tooandy/navidrome:latest
+    user: 0:0  # 需要对卷有写入权限
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      - ND_CONFIGFILE=/data/navidrome.toml
+    volumes:
+      - /var/lib/navidrome:/data  # 配置文件放在 /var/lib/navidrome 中, 生成的数据库文件也会放在这里
+      - /path/to/your/music:/music 
+    depends_on:
+      - navichina
+
+  navichina:
+    container_name: navichina
+    image: tooandy/navichina:latest
+    user: 0:0   # 需要对卷有写入权限.
+    restart: unless-stopped
+    volumes:
+      - /path/to/your/music:/music # 如果需要 navidrome 将艺术家和专辑封面下载到音乐路径中, 需要和 navidrome 的卷设置相同.
+    ports:
+      - 22522:22522   # 外部端口需要设置为 22522, 因为 tooandy/navidrome 容器默认访问 22522 端口. 如果需要修改端口, 建议使用 navichina 项目中的 build-navidrome.sh 脚本重新构建一个镜像
+```
+
+### 2. 自己编译打包运行
 ***确保本地安装了 node, go 和 TagLib***. 具体版本要求见 [Navidrome](https://www.navidrome.org/docs/installation/build-from-source/)
 ```shell
-git clone navidrome-wangyiyun
-cd navidrome-wangyiyun
+git clone https://github.com/TooAndy/navichina.git
+cd navichina
 # 需要 docker 环境. 默认构建为 deluan/navidrome:develop 镜像
 sh build-navidrome.sh
 # 通过 docker 的方式, 运行本项目的代理软件和部署修改源码重新编译后的 deluan/navidrome:develop 镜像
@@ -40,6 +76,8 @@ docker compose -f navichina.yaml up -d
 GPL-3.0 license
 
 ## 相关链接
-1. [Navidrome](https://www.navidrome.org/)
+1. [Navidrome 官网](https://www.navidrome.org/)
+2. [官方 Navidrome github 仓库](https://github.com/navidrome/navidrome)
+2. [tooandy/navidrome/ github 仓库](https://github.com/tooandy/navidrome)
 2. [LrcApi](https://github.com/HisAtri/LrcApi)
-3. [StreamMusic](https://github.com/gitbobobo/StreamMusic)
+3. [音流 StreamMusic](https://github.com/gitbobobo/StreamMusic)
