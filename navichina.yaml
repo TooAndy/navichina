@@ -1,30 +1,33 @@
 services:
   navichina:
     container_name: navichina
-    image: tooandy/navichina:1.0.0
+    image: tooandy/navichina:latest
     user: 1000:1000 # should be owner of volumes
     ports: 
-      - 22522:22522
+      - 22522:22522 # tooandy/navidrome 默认使用 22522 端口访问 navichina
     restart: unless-stopped
     volumes:
-      - /tmp/.cache:/app/.cache
+      - /tmp/.cache:/.cache
+      - /path/to/your/music/:/music # 需要有写权限. 
+    environment:
+      COVER_AUTO_DOWNLOAD: "false" # 默认 false, 若为 true, 需要配置 /music 卷映射 和 ALBUM_REGEX_PATTERN 变量
+      ALBUM_REGEX_PATTERN: "(.*)" # COVER_AUTO_DOWNLOAD 为 true 时启用, 表示如何处理 /music/中的专辑名. 默认全匹配. 如果是 2004-七里香, 由于专辑名时 "七里香", 则填写 "\d+-(.*)", 一定要有一个 group
 
-  # 以下 navidrome 是官方推荐的配置. 根据自己需要更改
-  # navidrome:
-  #   image: deluan/navidrome:develop
-  #   user: 1000:1000 # should be owner of volumes
-  #   ports:
-  #     - "4533:4533"
-  #   restart: unless-stopped
-  #   environment:
-  #     # Optional: put your config options customization here. Examples:
-  #     ND_SCANSCHEDULE: 1h
-  #     ND_LOGLEVEL: info  
-  #     ND_SESSIONTIMEOUT: 24h
-  #     ND_BASEURL: ""
-  #   volumes:
-  #     - "/path/to/data:/data"
-  #     - "/path/to/your/music/folder:/music:ro"
-  #   depends_on:
-  #     - navichina
+  以下 navidrome 是官方推荐的配置. 根据自己需要更改
+  navidrome:
+    image: tooandy/navidrome:develop
+    user: 1000:1000 # should be owner of volumes
+    network_mode: host  # 使用容器的话, 必须为 host 模式, 因为非host模式, 容器内 127.0.0.1 指向的是容器内不网络, 不能访问到宿主机
+    restart: unless-stopped
+    environment:
+      # Optional: put your config options customization here. Examples:
+      ND_SCANSCHEDULE: 1h
+      ND_LOGLEVEL: info  
+      ND_SESSIONTIMEOUT: 24h
+      ND_BASEURL: ""
+    volumes:
+      - "/path/to/data:/data"
+      - "/path/to/your/music/folder:/music"
+    depends_on:
+      - navichina
 

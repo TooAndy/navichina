@@ -31,5 +31,5 @@ make build
 # 可以用 make server 进行快速测试
 # make server
 
-# 打包为 docker镜像. 默认为 deluan/navidrome:develop 
-make docker
+# 打包为 docker 镜像. 默认为 deluan/navidrome:develop
+make docker-image
