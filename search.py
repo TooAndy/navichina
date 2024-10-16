@@ -4,6 +4,7 @@ import requests
 import urllib
 
 from textcompare import association
+from ttscn import t2s
 
 
 # logging.basicConfig(level=logging.INFO)
@@ -83,6 +84,8 @@ def filter_and_get_album_id(album_list, album):
     highest_similarity = 0
     
     for candidate_album in album_list:
+        if album == candidate_album['name']:
+            return candidate_album['id']
         similarity = association(album, candidate_album['name'])
         if similarity > highest_similarity:
             highest_similarity = similarity
@@ -99,6 +102,8 @@ def get_album_info_by_id(album_id):
 
 
 def get_album_info(artist, album):
+    artist = t2s(artist)
+    album = t2s(album)
     # 1. 根据 artist, 获取 artist_id
     if blur_result := search_artist_blur(artist_blur=artist):
         artist_id = blur_result['id']
@@ -112,6 +117,7 @@ def get_album_info(artist, album):
 
 
 def get_artist_profile(artist):
+    artist = t2s(artist)
     if artist is None or artist.strip() == '':
         return None
     if blur_result := search_artist_blur(artist_blur=artist):

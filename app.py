@@ -1,8 +1,10 @@
 import logging
 import sys
+import threading
 
 from waitress import serve
 from args import GlobalArgs
+from cover import download_covers_auto
 from proxy import app
 
 args = GlobalArgs()
@@ -24,6 +26,8 @@ if __name__ == '__main__':
     # 日志配置
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     logger = logging.getLogger('')
-    logger.info("正在启动服务器")
+    task_thread = threading.Thread(target=download_covers_auto)
+    task_thread.start()
     # 启动
+    logger.info("正在启动服务器")
     run_server(args.debug)

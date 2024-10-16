@@ -1,22 +1,18 @@
-from functools import cache
-import logging
 import re
-from urllib.parse import unquote
-from flask import abort, request, jsonify, redirect
-import traceback
-import shutil
-from flask import Flask, request
-from flask_caching import Cache
-
 import requests
-
+import traceback
+from flask_caching import Cache
+from functools import cache
+from urllib.parse import unquote
+from flask import Flask, abort, request, jsonify, redirect
+from cover import  download_image_async
 from search import get_album_info, get_artist_profile # type: ignore
 
 app = Flask(__name__)
- 
+
 
 # 缓存
-cache_dir = './.cache'
+cache_dir = '/.cache'
 # try:
 #     shutil.rmtree(cache_dir)
 # except FileNotFoundError:
@@ -73,6 +69,10 @@ def proxy_spotfiy():
             # items.append({"name":artist['name'], "popularity": 100, "images": images})
             items.append({"name":artist_name, "popularity": 100, "images": images})
             app.logger.info(f"200 GET /spotify/search?{unquote(request.query_string.decode('utf-8'))}")
+
+            # 查询成功的话, 下载封面放在 music_dir 中
+            download_image_async(url, artist_name)
+           
             return jsonify({"artists": {"items": items}})
         except:
             app.logger.error("Traceback: %s", traceback.format_exc())
@@ -89,7 +89,6 @@ def proxy_spotfiy():
 @cache.cached(timeout=86400, key_prefix=make_cache_key)
 def proxy_lastfm():
     lastfm_api_url = f"https://ws.audioscrobbler.com/2.0/?{request.query_string.decode('utf-8')}"
-    
 
     lastfm_resp = requests.get(lastfm_api_url, headers=request.headers).json()
     artist_name = request.args.get('artist')
@@ -139,6 +138,7 @@ def proxy_lastfm():
                     image['#text'] = album_info['picUrl']
                 image['#text'] = album_info['blurPicUrl']
             app.logger.info(f"200 GET /lastfm/?{unquote(request.query_string.decode('utf-8'))}")
+            download_image_async(album_info['picUrl'], artist_name, album_name)
             return jsonify(lastfm_resp)
         abort(400, {"code": 400, "message": f"无法根据 {artist_name} + {album_name} 查询到专辑"})
     else:
