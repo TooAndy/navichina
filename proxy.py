@@ -29,9 +29,6 @@ cache = Cache(app, config={
 def make_cache_key(*args, **kwargs) -> str:
     path: str = request.path
     args: str = str(hash(frozenset(request.args.items())))
-    # auth_key:str = str(request.headers.get('Authorization', '')
-    #    or request.headers.get('Authentication', ''))
-    # cookie:str = str(request.cookies.get('api_auth_token', ''))
     return path + args
 
 
