@@ -5,8 +5,8 @@ from flask_caching import Cache
 from functools import cache
 from urllib.parse import unquote
 from flask import Flask, abort, request, jsonify, redirect
-from cover import  download_image_async
-from search import get_album_info, get_artist_profile # type: ignore
+from cover import download_image_async
+from search import get_album_info, get_artist_profile  # type: ignore
 
 app = Flask(__name__)
 
@@ -24,11 +24,13 @@ cache = Cache(app, config={
 })
 
 # 缓存键，解决缓存未忽略参数的情况 COPY FROM LRCAPI
+
+
 def make_cache_key(*args, **kwargs) -> str:
-    path:str = request.path
-    args:str = str(hash(frozenset(request.args.items())))
+    path: str = request.path
+    args: str = str(hash(frozenset(request.args.items())))
     # auth_key:str = str(request.headers.get('Authorization', '')
-                    #    or request.headers.get('Authentication', ''))
+    #    or request.headers.get('Authentication', ''))
     # cookie:str = str(request.cookies.get('api_auth_token', ''))
     return path + args
 
@@ -38,15 +40,15 @@ def make_cache_key(*args, **kwargs) -> str:
 def proxy_spotfiy():
     search_type = request.args.get('type')
     spotify_origin_url = f"https://api.spotify.com/v1/search?{request.query_string.decode('utf-8')}"
-    
+
     if search_type == "artist":
         artist_name = request.args.get('q')
         artist_name_1 = None
-        
+
         if any(substring in artist_name for substring in [' and ', "&"]):
             sp = re.split(r" and |&", artist_name)
             artist_name_1 = sp[0].strip()
-        
+
         try:
             artist_profile = get_artist_profile(artist_name)
             if not artist_profile and artist_name_1 is not None:
@@ -57,22 +59,22 @@ def proxy_spotfiy():
                 app.logger.debug(f"查询到 {artist['name']}")
             else:
                 app.logger.info(f"400 GET /spotify/search/?{unquote(request.query_string.decode('utf-8'))}")
-                return jsonify({"code":400, "message": f"无法查询到名称为[{artist_name}]的艺术家"})
+                return jsonify({"code": 400, "message": f"无法查询到名称为[{artist_name}]的艺术家"})
 
             items = []
             images = []
             url = artist['img1v1Url']
             for i in range(3):
                 # height 和 width 在 navidrome 中, 只用作排序. 所以大具体值无所谓
-                image = {"height": 160 * (i + 1),"width": 160 * (i + 1),"url": url}
+                image = {"height": 160 * (i + 1), "width": 160 * (i + 1), "url": url}
                 images.append(image)
             # items.append({"name":artist['name'], "popularity": 100, "images": images})
-            items.append({"name":artist_name, "popularity": 100, "images": images})
+            items.append({"name": artist_name, "popularity": 100, "images": images})
             app.logger.info(f"200 GET /spotify/search?{unquote(request.query_string.decode('utf-8'))}")
 
             # 查询成功的话, 下载封面放在 music_dir 中
             download_image_async(url, artist_name)
-           
+
             return jsonify({"artists": {"items": items}})
         except:
             app.logger.error("Traceback: %s", traceback.format_exc())
@@ -85,20 +87,24 @@ def proxy_spotfiy():
         return redirect(spotify_origin_url)
 
 
-@app.route('/lastfm/', methods=['GET'])
+@app.route('/lastfm/', methods=['GET', 'POST'])
 @cache.cached(timeout=86400, key_prefix=make_cache_key)
 def proxy_lastfm():
     lastfm_api_url = f"https://ws.audioscrobbler.com/2.0/?{request.query_string.decode('utf-8')}"
 
-    lastfm_resp = requests.get(lastfm_api_url, headers=request.headers).json()
-    artist_name = request.args.get('artist')
-    if 'error' in lastfm_resp:
-        app.logger.info(f"400 GET /lastfm/?{unquote(request.query_string.decode('utf-8'))}")
-        abort(400, {"code": 400, "message": f"无法在lastfm 中查询到 {artist_name}"})
+    if request.method == "POST":
+        resp = requests.post(lastfm_api_url, json=None, headers=request.headers)
+        app.logger.info(f"{resp.status_code} POST /lastfm/?{unquote(request.query_string.decode('utf-8'))}")
+        return jsonify(resp.json()), resp.status_code
 
     method = request.args.get('method')
-    
     if method.lower() == "artist.getinfo":
+        lastfm_resp = requests.get(lastfm_api_url, headers=request.headers).json()
+        artist_name = request.args.get('artist')
+        if 'error' in lastfm_resp:
+            app.logger.info(f"400 GET /lastfm/?{unquote(request.query_string.decode('utf-8'))}")
+            abort(400, {"code": 400, "message": f"无法在lastfm 中查询到 {artist_name}"})
+
         artist_name_1 = None
         if any(substring in artist_name for substring in [' and ', "&"]):
             # 尝试拆分名字.
@@ -113,9 +119,9 @@ def proxy_lastfm():
                 lastfm_resp['artist']['bio']['content'] = artist['briefDesc']
                 lastfm_resp['artist']['bio']['summary'] = artist['briefDesc']
                 for image in lastfm_resp['artist']['image']:
-                   if image['size'] in ['mega', 'extralarge', 'large']:
-                       image['#text'] = artist['picUrl']
-                   image['#text'] = artist['img1v1Url']
+                    if image['size'] in ['mega', 'extralarge', 'large']:
+                        image['#text'] = artist['picUrl']
+                    image['#text'] = artist['img1v1Url']
                 app.logger.info(f"200 GET /lastfm/?{unquote(request.query_string.decode('utf-8'))}")
                 return jsonify(lastfm_resp)
         except:
@@ -123,6 +129,12 @@ def proxy_lastfm():
         app.logger.info(f"400 GET /lastfm/?{unquote(request.query_string.decode('utf-8'))}")
         abort(400, {"code": 400, "message": f"无法根据 {artist_name} 查询到艺术家"})
     elif method.lower() == "album.getinfo":
+        lastfm_resp = requests.get(lastfm_api_url, headers=request.headers).json()
+        artist_name = request.args.get('artist')
+        if 'error' in lastfm_resp:
+            app.logger.info(f"400 GET /lastfm/?{unquote(request.query_string.decode('utf-8'))}")
+            abort(400, {"code": 400, "message": f"无法在lastfm 中查询到 {artist_name}"})
+
         # 从请求参数中获取专辑和艺术家信息
         artist_name = request.args.get('artist')
         album_name = request.args.get('album')
@@ -132,7 +144,7 @@ def proxy_lastfm():
         if album_info := get_album_info(artist_name, album_name):
             album_result = lastfm_resp["album"]
             album_result["mbid"] = mbid
-            album_result["wiki"] =  {"summary": album_info['description']}
+            album_result["wiki"] = {"summary": album_info['description']}
             for image in album_result['image']:
                 if image['size'] in ['mega', 'extralarge', 'large']:
                     image['#text'] = album_info['picUrl']
@@ -145,4 +157,3 @@ def proxy_lastfm():
         # 对其他请求直接重定向到原接口
         app.logger.info(f"302 GET /lastfm/?{unquote(request.query_string.decode('utf-8'))}")
         return redirect(lastfm_api_url)
-    
