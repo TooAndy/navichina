@@ -1,3 +1,5 @@
+[![Docker Pulls](https://img.shields.io/docker/pulls/tooandy/navichina?logo=docker&label=pulls&style=flat-square)](https://hub.docker.com/r/tooandy/navichina)
+
 ## 背景
 由于 navidrome 只能使用 Spotify 获取歌曲封面, 通过 Last.fm 获取艺术家信息和专辑信息, 对于中文歌曲来说, 不太友好, 例如: 
 - 对于华语歌手来说, Last.fm 中缺失大多数艺术家描述
