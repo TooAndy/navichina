@@ -39,7 +39,7 @@ services:
     restart: unless-stopped
     environment:
       - ND_CONFIGFILE=/data/navidrome.toml
-      # Spotify 账号已不再需要，但仍需要配置(非空值即可)，否则无法启用 Spotify 的功能
+      # Spotify 账号已不再需要，但仍需要配置(非空值即可，例如下面的AAAA、BBBB)，否则无法启用 Spotify 的功能
       - ND_SPOTIFY_ID=AAAA
       - ND_SPOTIFY_SECRET=BBBB
       # Lastfm 账号仍然需要，注册Last.FM账户后，前往 https://www.last.fm/zh/api/account/create 创建 API 帐户
