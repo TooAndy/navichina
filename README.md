@@ -39,9 +39,16 @@ services:
     restart: unless-stopped
     environment:
       - ND_CONFIGFILE=/data/navidrome.toml
+      # Spotify 账号已不再需要，但仍需要配置(非空值即可)，否则无法启用 Spotify 的功能
+      - ND_SPOTIFY_ID=AAAA
+      - ND_SPOTIFY_SECRET=BBBB
+      # Lastfm 账号仍然需要，注册Last.FM账户后，前往 https://www.last.fm/zh/api/account/create 创建 API 帐户
+      - ND_LASTFM_APIKEY=<根据真实账号填写>
+      - ND_LASTFM_SECRET=<根据真实账号填写>
+      - ND_LASTFM_LANGUAGE=zh
     volumes:
-      - /var/lib/navidrome:/data  # 配置文件放在 /var/lib/navidrome 中, 生成的数据库文件也会放在这里
-      - /path/to/your/music:/music 
+      - <配置文件路径>:/data  # 配置文件放在 /var/lib/navidrome 中, 生成的数据库文件也会放在这里
+      - <音乐路径>:/music
     depends_on:
       - navichina
 
@@ -51,7 +58,7 @@ services:
     user: 0:0   # 需要对卷有写入权限.
     restart: unless-stopped
     volumes:
-      - /path/to/your/music:/music # 如果需要 navidrome 将艺术家和专辑封面下载到音乐路径中, 需要和 navidrome 的卷设置相同.
+      - <音乐路径>:/music # 如果需要 navidrome 将艺术家和专辑封面下载到音乐路径中, 需要和 navidrome 的卷设置相同.
     ports:
       - 22522:22522   # 外部端口需要设置为 22522, 因为 tooandy/navidrome 容器默认访问 22522 端口. 如果需要修改端口, 建议使用 navichina 项目中的 build-navidrome.sh 脚本重新构建一个镜像
 ```
