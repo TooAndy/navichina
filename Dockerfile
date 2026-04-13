@@ -1,5 +1,5 @@
 # 第一阶段：安装GCC
-FROM python:3.11-alpine as gcc_installer
+FROM python:3.11-alpine AS gcc_installer
 
 # 安装GCC及其他依赖
 # RUN apk update --repository=https://mirrors.aliyun.com/alpine/v3.20/main \
@@ -13,7 +13,7 @@ RUN echo "https://mirrors.aliyun.com/alpine/v3.20/main" > /etc/apk/repositories 
 
 
 # 第二阶段：安装Python依赖
-FROM gcc_installer as requirements_installer
+FROM gcc_installer AS requirements_installer
 
 # 设置工作目录
 WORKDIR /app
