@@ -1,6 +1,19 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/tooandy/navichina?logo=docker&label=pulls&style=flat-square)](https://hub.docker.com/r/tooandy/navichina)
 
-## 背景
+> [!IMPORTANT]
+> **本项目已停止维护。**
+>
+> Navidrome 现已支持[插件形式](https://www.navidrome.org/docs/development/plugins/)获取封面/歌词等信息，推荐直接使用官方方案，不再需要 navichina。
+
+## 背景（历史记录）
+
+navichina 诞生于 navidrome 只能通过 Spotify + Last.fm 获取媒体信息的时期。由于不懂 golang，无法直接贡献源码，采用代理拦截的方式调用网易云音乐接口解决中文歌曲的封面/艺术家描述问题。
+
+## ⚠️ 停更原因
+
+Navidrome 后续版本已支持**插件化扩展**，可以直接通过插件获取封面/歌词，无需本代理。建议迁移至官方插件方案：https://www.navidrome.org/docs/development/plugins/
+
+## 历史方案（仅供存档）
 由于 navidrome 只能使用 Spotify 获取歌曲封面, 通过 Last.fm 获取艺术家信息和专辑信息, 对于中文歌曲来说, 不太友好, 例如: 
 - 对于华语歌手来说, Last.fm 中缺失大多数艺术家描述
 - 从 Last.fm 中获取的艺术家描述基本上都是英文的
