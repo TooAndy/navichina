@@ -3,7 +3,7 @@
 > [!IMPORTANT]
 > **本项目已停止维护。**
 >
-> Navidrome 现已支持[插件形式](https://www.navidrome.org/docs/usage/features/plugins/#finding-plugins)获取封面/歌词等信息，推荐直接使用官方方案，不再需要 navichina。
+> Navidrome 现已支持[插件形式](https://www.navidrome.org/docs/usage/features/plugins)获取封面/歌词等信息，推荐直接使用官方方案，不再需要 navichina。
 
 ## 背景（历史记录）
 
@@ -11,7 +11,7 @@ navichina 诞生于 navidrome 只能通过 Spotify + Last.fm 获取媒体信息�
 
 ## ⚠️ 停更原因
 
-Navidrome 后续版本已支持**插件化扩展**，可以直接通过插件获取封面/歌词，无需本代理。建议迁移至官方插件方案：https://www.navidrome.org/docs/usage/features/plugins/#finding-plugins
+Navidrome 后续版本已支持**插件化扩展**，可以直接通过插件获取封面/歌词，无需本代理。建议迁移至官方插件方案：https://www.navidrome.org/docs/usage/features/plugins
 
 ## 历史方案（仅供存档）
 由于 navidrome 只能使用 Spotify 获取歌曲封面, 通过 Last.fm 获取艺术家信息和专辑信息, 对于中文歌曲来说, 不太友好, 例如: 
